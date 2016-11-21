@@ -37,7 +37,7 @@ EXPOSE 9999
 # note we also use xvfb which is required for viz
 ENTRYPOINT ["/usr/local/bin/tini", "--", "xvfbrun.sh"]
 
-ENV PYTHON_PATH=/build/underworld2
+ENV PYTHONPATH=/build/underworld2
 ENV LD_LIBRARY_PATH=/build/pyBadlands/pyBadlands/libUtils
 CMD /build/run.sh
 
