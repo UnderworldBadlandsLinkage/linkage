@@ -1,4 +1,4 @@
-FROM underworldbadlandslinkage/uwbl-base
+FROM underworldbadlandslinkage/base
 
 MAINTAINER Ian Howson
 

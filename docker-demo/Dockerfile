@@ -1,4 +1,4 @@
-FROM underworldbadlandslinkage/uwbl-models
+FROM underworldbadlandslinkage/models
 
 MAINTAINER Ian Howson
 
