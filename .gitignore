@@ -2,3 +2,4 @@ output*/
 uwout/
 *.pyc
 *.sublime-*
+*.egg-info/
