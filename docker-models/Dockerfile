@@ -30,3 +30,6 @@ RUN git clone --branch "development" --single-branch https://github.com/underwor
     rm -fr PICellerator          && \
     rm -fr Solvers
 
+# install Linkage
+WORKDIR /build
+RUN git clone https://github.com/UnderworldBadlandsLinkage/linkage.git

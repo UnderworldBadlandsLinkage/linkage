@@ -16,7 +16,6 @@ RUN mkdir /workspace && \
 
 # Install demo notebooks
 WORKDIR /build
-RUN git clone https://github.com/UnderworldBadlandsLinkage/linkage.git
 RUN cp -av /build/linkage/examples/* /workspace/
 
 VOLUME /workspace/volume
