@@ -1,6 +1,10 @@
 # DEM demo
 # Load a DEM into Badlands and verify that it is transferred to Underworld
 
+# After you run this, you can open material-0.xdmf and tin.series.xdmf in
+# ParaView. Setting the Z scale to 10 will make things clearer. You should also
+# change the colour values on the material
+
 import numpy
 import os
 import pandas

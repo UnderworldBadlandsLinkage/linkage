@@ -76,8 +76,8 @@ class LinkageModel(object):
         # material type is changed to deposited_material_index. If Badlands
         # erodes material from a location, the material type is changed to
         # eroded_material_index. You can change these to anything you like.
-        self.deposited_material_index = 103
-        self.eroded_material_index = 104
+        self.deposited_material_index = 1
+        self.eroded_material_index = 0
 
         self.air_material_indices = [self.eroded_material_index]
         self.sediment_material_indices = [self.deposited_material_index]
@@ -125,7 +125,6 @@ class LinkageModel(object):
             dt_years = dt_seconds / self.SECONDS_PER_YEAR
 
             # Advect the Badlands interface surface
-            print 'advect %s seconds' % dt_seconds
             self._surface_advector.integrate(dt_seconds)
 
             # Synchronise the velocity field across nodes
@@ -225,8 +224,13 @@ class LinkageModel(object):
 
         self._next_checkpoint_years = self.checkpoint_interval
 
-        # Perform an initial checkpoint
+        # Perform an initial Underworld checkpoint
         self.checkpoint_function(self, self._checkpoint_number, self.time_years)
+
+        # Bodge Badlands to perform an initial checkpoint
+        # FIXME: we need to run the model for at least one iteration before this is generated. It would be nice if this wasn't the case.
+        self.badlands_model.force.next_display = 0
+
         self._checkpoint_number += 1
 
         self._model_started = True
