@@ -79,6 +79,9 @@ class LinkageModel(object):
         self.deposited_material_index = 103
         self.eroded_material_index = 104
 
+        self.air_material_indices = [self.eroded_material_index]
+        self.sediment_material_indices = [self.deposited_material_index]
+
         # --- You don't need to modify any settings below this line ---
 
         self.time_years = 0.  # Simulation time in years. We start at year 0.
