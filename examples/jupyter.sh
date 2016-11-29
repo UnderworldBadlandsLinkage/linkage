@@ -22,4 +22,3 @@ jupyter notebook
 
 # If you're using a virtualenv, activate it before starting Jupyter
 #bash -c '. ../../env/bin/activate && jupyter notebook'
-
