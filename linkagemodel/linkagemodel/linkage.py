@@ -100,17 +100,17 @@ class LinkageModel(object):
     def run_for_years(self, years):
         """
         Run the model for a number of years.
-
-        If you pass 0 for the number of years, all of the initial states will
-        be set up but the model will not be run.
         """
         if not self._model_started:
             self._startup()
 
         end_years = self.time_years + years
         while self.time_years < end_years:
-            # What's the longest we can run before we have to write a checkpoint?
-            max_seconds = (self._next_checkpoint_years - self.time_years) * self.SECONDS_PER_YEAR
+            # What's the longest we can run before we have to write a
+            # checkpoint or stop?
+            max_years = self._next_checkpoint_years - self.time_years
+            max_years = min(end_years - self.time_years, max_years)
+            max_seconds = max_years * self.SECONDS_PER_YEAR
 
             # Ask the Underworld model to update
             dt_seconds = self.update_function(self, max_seconds)
