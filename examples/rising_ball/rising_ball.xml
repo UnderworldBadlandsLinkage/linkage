@@ -4,12 +4,7 @@
     <!-- Regular grid structure -->
     <grid>
         <!-- Digital elevation model file path -->
-        <!--
-            FIXME: REMOVE THIS
-            Right now the Badlands XML parse needs to find something.
-            This isn't always appropriate for Linkage.
-        -->
-        <demfile>flat/nodes.csv</demfile>
+        <!-- <demfile>flat/nodes.csv</demfile> -->
         <!-- Boundary type: flat, slope or wall -->
         <boundary>slope</boundary>
         <!-- Optional parameter (integer) used to decrease TIN resolution.
