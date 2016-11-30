@@ -36,7 +36,7 @@ linkage.badlands_model = badlands_model
 
 ### SET UP THE UNDERWORLD MODEL
 
-# All output will go to the 'uwout' directory, which we assume already exists
+# All output will go to the 'uwout' directory, which we will create
 uw_output_path = 'uwout'
 try:
     os.mkdir(uw_output_path)
