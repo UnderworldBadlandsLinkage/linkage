@@ -267,7 +267,7 @@ class LinkageModel(object):
         np.savetxt('/tmp/dem.csv', array)
         self.load_badlands_dem_file('/tmp/dem.csv')
 
-    def _inject_badlands_displacement(self, time, dt, disp):#tracers, disp, blModel, time, dt, n, min_coord, max_coord, display_interval=None):
+    def _inject_badlands_displacement(self, time, dt, disp):
         """
         Takes a plane of tracer points and their DISPLACEMENTS in 3D over time
         period dt. Injects it into Badlands as 3D tectonic movement.
