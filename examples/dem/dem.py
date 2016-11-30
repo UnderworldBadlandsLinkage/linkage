@@ -9,11 +9,9 @@ import numpy
 import os
 import pandas
 
+from pyBadlands.model import Model as BadlandsModel
 import underworld as uw
 from underworld import function as fn
-
-from pyBadlands.model import Model as BadlandsModel
-
 from linkagemodel.linkage import LinkageModel
 
 # We're going to load from a DEM; let's just load it to determine the Underworld mesh size

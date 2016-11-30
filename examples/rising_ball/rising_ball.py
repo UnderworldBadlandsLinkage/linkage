@@ -4,11 +4,9 @@
 
 import os
 
+from pyBadlands.model import Model as BadlandsModel
 import underworld as uw
 from underworld import function as fn
-
-from pyBadlands.model import Model as BadlandsModel
-
 from linkagemodel.linkage import LinkageModel
 
 # parameters for our model composition
