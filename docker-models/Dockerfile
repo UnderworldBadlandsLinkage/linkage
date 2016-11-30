@@ -33,3 +33,5 @@ RUN git clone --branch "development" --single-branch https://github.com/underwor
 # install Linkage
 WORKDIR /build
 RUN git clone https://github.com/UnderworldBadlandsLinkage/linkage.git
+RUN pip install -e /build/linkage/linkagemodel
+
