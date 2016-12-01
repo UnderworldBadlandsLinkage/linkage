@@ -128,12 +128,34 @@ class LinkageModel(object):
             self._surface_advector.integrate(dt_seconds)
 
             # Synchronise the velocity field across nodes
-            print "TODO ENSURE SINGLE CORE"
-            # assert uw.size() == 1, "MPI is not supported yet"
-            # TODO implement sync across MPI nodes
+            # Each CPU saves its view of the velocity field so it can be reconstructed everywhere
+            # TODO: probably better to not use fixed tempfile names here
+            self.mesh.save('/tmp/mpi-mesh.h5')
+            self.velocity_field.save('/tmp/mpi-velfield.h5')
+            self._surface_tracers.save('/tmp/mpi-surface.h5')
+
+            # build a non-partitioned mesh with same box size
+            # TODO: I think we can store and reuse this instead of recreating on each iteration
+            np_mesh = uw.mesh.FeMesh_Cartesian(elementType=self.mesh.elementType,
+                                               elementRes =self.mesh.elementRes,
+                                               minCoord   =self.mesh.minCoord,
+                                               maxCoord   =self.mesh.maxCoord,
+                                               partitioned=False)
+
+            # load previous mesh coordinate data onto new non-partitioned mesh
+            np_mesh.load('/tmp/mpi-mesh.h5')
+
+            # TODO: can probably reuse this too
+            np_velocity_field = uw.mesh.MeshVariable(mesh=np_mesh, nodeDofCount=np_mesh.dim)
+            np_velocity_field.load('/tmp/mpi-velfield.h5')
+
+            np_surface_tracers = uw.swarm.Swarm(np_mesh)
+            np_surface_tracers.load('/tmp/mpi-surface.h5')
+            # np_surface contains the tracers across all nodes
 
             # the entire velocity vector on each particle in METERS PER SECOND
-            tracer_velocity_mps = self.velocity_field.evaluate(self._surface_tracers)
+            tracer_velocity_mps = np_velocity_field.evaluate(np_surface_tracers)  
+
 
             ### INTERFACE PART 1: UW->BL
             # Use the tracer vertical velocities to deform the Badlands TIN
@@ -143,6 +165,7 @@ class LinkageModel(object):
 
             # Run the Badlands model to the same time point
             self.badlands_model.run_to_time(self.time_years + dt_years)
+
 
             ### INTERFACE PART 2: BL->UW
             self._update_material_types()
@@ -194,7 +217,6 @@ class LinkageModel(object):
         We load everything, transfer the initial surface elevation from
         Badlands to Underworld, then write the initial state to disk.
         """
-
         assert not self._model_started
 
         # Make sure UW and BL are operating over the same XY domain
