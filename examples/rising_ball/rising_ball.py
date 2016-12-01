@@ -37,12 +37,10 @@ linkage.badlands_model = badlands_model
 dem = linkage.generate_flat_dem(minCoord=MIN_COORD, maxCoord=MAX_COORD, resolution=(180, 180), elevation=INITIAL_AIR_ELEVATION)
 
 # The linkage needs to know which Underworld material types correspond to air or sediment in Badlands' worldview.
-linkage.air_material_indices = [airIndex, erodedIndex]
-linkage.sediment_material_indices = [heavyIndex, lightIndex, sedimentIndex]
-
-# When Badlands deposits or erodes, these are the Underworld material types that it uses
-linkage.deposited_material_index = sedimentIndex
-linkage.eroded_material_index = erodedIndex
+linkage.material_map = [
+    [erodedIndex, airIndex],  # air layer; eroded material has its own material type
+    [sedimentIndex, heavyIndex, lightIndex]  # sediment layer; sediment has its own material
+]
 
 linkage.load_badlands_dem_array(dem)
 

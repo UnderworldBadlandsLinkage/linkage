@@ -70,17 +70,17 @@ class LinkageModel(object):
         # years apart
         self.checkpoint_interval = 10000
 
-        # When Badlands deposits sediment at a location, its material type is
-        # changed to deposited_material_index. If Badlands erodes material from
-        # a location, the material type is changed to eroded_material_indexits
-        # material type is changed to deposited_material_index. If Badlands
-        # erodes material from a location, the material type is changed to
-        # eroded_material_index. You can change these to anything you like.
-        self.deposited_material_index = 1
-        self.eroded_material_index = 0
-
-        self.air_material_indices = [self.eroded_material_index]
-        self.sediment_material_indices = [self.deposited_material_index]
+        # Default material map
+        # On the Underworld side, we assume two materials: air (index 0) and
+        # sediment (index 1)
+        # On the Badlands side, we assume one erosion layer, so there is only
+        # air and sediment
+        # See https://github.com/UnderworldBadlandsLinkage/linkage/wiki/Material-maps
+        # for more information
+        self.material_map = [
+            [0],
+            [1],
+        ]
 
         # --- You don't need to modify any settings below this line ---
 
@@ -266,6 +266,9 @@ class LinkageModel(object):
         # greater than the supplied Z (i.e. Badlands mesh is above particle
         # elevation) it's sediment (True). Else, it's air (False).
 
+        # TODO: we only support air/sediment layers right now; erodibility
+        # layers are not implemented
+
         known_xy = self.badlands_model.recGrid.tinMesh['vertices']  # points that we have known elevation for
         known_z = self.badlands_model.elevation  # elevation for those points
 
@@ -323,11 +326,12 @@ class LinkageModel(object):
 
         # If any materials changed state, update the Underworld material types
         # TODO(perf): vectorise
+        # TODO: update the material_map[1] stuff when we have erodibility layers
         for index, material in enumerate(self.material_index.data):
             # convert air to sediment
-            if int(material) in self.air_material_indices and material_flags[index]:
-                self.material_index.data[index] = self.deposited_material_index
+            if int(material) in self.material_map[0] and material_flags[index]:
+                self.material_index.data[index] = self.material_map[1][0]
 
             # convert sediment to air
-            if int(material) in self.sediment_material_indices and not material_flags[index]:
-                self.material_index.data[index] = self.eroded_material_index
+            if int(material) in self.material_map[1] and not material_flags[index]:
+                self.material_index.data[index] = self.material_map[0][0]

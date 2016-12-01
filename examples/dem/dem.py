@@ -66,7 +66,7 @@ swarmLayout = uw.swarm.layouts.GlobalSpaceFillerLayout(swarm=swarm, particlesPer
 swarm.populate_using_layout(layout=swarmLayout)
 
 # Set the whole thing to be 'sediment'. At initialisation, Badlands will dividie it into sediment/air.
-materialIndex.data[:] = linkage.deposited_material_index
+materialIndex.data[:] = linkage.material_map[1][0]
 
 advector = uw.systems.SwarmAdvector(swarm=swarm, velocityField=velocityField, order=2)
 
