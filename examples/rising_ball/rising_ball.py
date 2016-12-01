@@ -52,8 +52,13 @@ linkage.load_badlands_dem_array(dem)
 
 ### SET UP THE UNDERWORLD MODEL
 
-# All output will go to the 'uwout' directory, which we assume already exists
+# All output will go to the 'uwout' directory, which we will create
 uw_output_path = 'uwout'
+try:
+    os.mkdir(uw_output_path)
+except OSError:
+    # probably already exists
+    pass
 
 # We want a domain full of 'heavy' material with a sphere composed of
 # 'light' material. The sphere will be rise toward the surface, which
@@ -61,11 +66,11 @@ uw_output_path = 'uwout'
 
 # Underworld models normally run at a much lower resolution than
 # Badlands models in order to keep the computation time reasonable.
-UNDERWORLD_RESOLUTION = 20
+UNDERWORLD_RESOLUTION = [20, 20, 32]
 
 # This is the mesh whose material types will be changed by Badlands
 mesh = uw.mesh.FeMesh_Cartesian(elementType=("Q1/dQ0"),
-                                elementRes =[UNDERWORLD_RESOLUTION] * 3,
+                                elementRes =UNDERWORLD_RESOLUTION,
                                 minCoord   =MIN_COORD,
                                 maxCoord   =MAX_COORD)
 
@@ -121,7 +126,7 @@ velocityBC = uw.conditions.DirichletCondition(variable=velocityField,
 # combine all the above into Stokes system and get solver
 stokesPIC = uw.systems.Stokes(velocityField=velocityField,
                               pressureField=pressureField,
-                              swarm        =swarm,
+                              voronoi_swarm=swarm,
                               conditions   =[velocityBC, ],
                               fn_viscosity =viscosityMapFn,
                               fn_bodyforce =buoyancyFn)
