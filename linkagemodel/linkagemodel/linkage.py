@@ -97,6 +97,8 @@ class LinkageModel(object):
         # to ensure that BL and UW do not desync after many timesteps.
         self.disable_material_changes = False
 
+        self.np_mesh = None  # Non-partitioned copy of 'mesh', configured during model startup
+
     def run_for_years(self, years):
         """
         Run the model for a number of years.
@@ -143,18 +145,18 @@ class LinkageModel(object):
                                                partitioned=False)
 
             # load previous mesh coordinate data onto new non-partitioned mesh
-            np_mesh.load('/tmp/mpi-mesh.h5')
+            self.np_mesh.load('/tmp/mpi-mesh.h5')
 
             # TODO: can probably reuse this too
-            np_velocity_field = uw.mesh.MeshVariable(mesh=np_mesh, nodeDofCount=np_mesh.dim)
+            np_velocity_field = uw.mesh.MeshVariable(mesh=self.np_mesh, nodeDofCount=self.np_mesh.dim)
             np_velocity_field.load('/tmp/mpi-velfield.h5')
 
-            np_surface_tracers = uw.swarm.Swarm(np_mesh)
+            np_surface_tracers = uw.swarm.Swarm(self.np_mesh)
             np_surface_tracers.load('/tmp/mpi-surface.h5')
             # np_surface contains the tracers across all nodes
 
             # the entire velocity vector on each particle in METERS PER SECOND
-            tracer_velocity_mps = np_velocity_field.evaluate(np_surface_tracers)  
+            tracer_velocity_mps = np_velocity_field.evaluate(np_surface_tracers)
 
 
             ### INTERFACE PART 1: UW->BL
@@ -244,6 +246,13 @@ class LinkageModel(object):
 
         self._surface_advector = uw.systems.SwarmAdvector(swarm=bl_tracers, velocityField=self.velocity_field, order=2)
         self._surface_tracers = bl_tracers
+
+        # build a non-partitioned mesh to sync model state across MPI nodes
+        self.np_mesh = uw.mesh.FeMesh_Cartesian(elementType=self.mesh.elementType,
+                                                elementRes =self.mesh.elementRes,
+                                                minCoord   =self.mesh.minCoord,
+                                                maxCoord   =self.mesh.maxCoord,
+                                                partitioned=False)
 
         # Transfer the initial DEM state to Underworld
         self._update_material_types()
