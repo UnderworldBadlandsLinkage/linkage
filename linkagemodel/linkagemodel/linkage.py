@@ -196,13 +196,17 @@ class LinkageModel(object):
         same formatting as the Underworld FeMesh_Cartesian minCoord and
         maxCoord parameters.
 
+        IMPORTANT: minCoord and maxCoord are defined in terms of the Underworld
+        coordinate system, but the returned DEM uses the Badlands coordinate
+        system.
+
         Note that the initial elevation of the Badlands surface should coincide
         with the material transition in Underworld.
         """
         items = []
         # FIXME: there should be a fast numpy way to do this
-        for y in np.linspace(minCoord[1], maxCoord[1], resolution[1]):
-            for x in np.linspace(minCoord[0], maxCoord[0], resolution[0]):
+        for y in np.linspace(minCoord[0], maxCoord[0], resolution[0]):
+            for x in np.linspace(minCoord[1], maxCoord[1], resolution[1]):
                 items.append([x, y, elevation])
 
         # NOTE: Badlands uses the difference in X coord of the first two points to determine the resolution.
