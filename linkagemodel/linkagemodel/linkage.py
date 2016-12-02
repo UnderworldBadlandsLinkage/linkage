@@ -136,14 +136,6 @@ class LinkageModel(object):
             self.velocity_field.save('/tmp/mpi-velfield.h5')
             self._surface_tracers.save('/tmp/mpi-surface.h5')
 
-            # build a non-partitioned mesh with same box size
-            # TODO: I think we can store and reuse this instead of recreating on each iteration
-            np_mesh = uw.mesh.FeMesh_Cartesian(elementType=self.mesh.elementType,
-                                               elementRes =self.mesh.elementRes,
-                                               minCoord   =self.mesh.minCoord,
-                                               maxCoord   =self.mesh.maxCoord,
-                                               partitioned=False)
-
             # load previous mesh coordinate data onto new non-partitioned mesh
             self.np_mesh.load('/tmp/mpi-mesh.h5')
 
