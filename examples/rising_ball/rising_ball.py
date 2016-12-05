@@ -102,8 +102,6 @@ for index, coord in enumerate(swarm.particleCoordinates.data):
 # Set viscosities and densities of the model.
 viscosityMapFn = 1e19
 
-# TODO update below comment
-# Here we set a density of '0.' for the lightMaterial, and '1.' for the heavymaterial.
 mappingDictDensity = {airIndex: 3300.0,
                       lightIndex: 3240.0,
                       heavyIndex: 3300.0,
