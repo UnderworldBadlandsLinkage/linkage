@@ -43,6 +43,11 @@ class LinkageModel(object):
         the behaviour of the model at a specific time.
         The update_function member can be changed at any time (say, if you're running in a Jupyter Notebook and want to adjust the model mid-run).
 
+        Remember that you can store data on the linkage object like so:
+            linkage.private_stuff = some object
+        and get it back during the update/checkpoint calls:
+            some object = linkage.private_stuff
+
     checkpoint_function: a function which is called at the end of each checkpoint interval. You should write any relevant Underworld state to disk. Badlands state is written to disk automatically.
         The function is called with arguments 'linkage' and 'checkpoint_number'
         linkage: the linkage model object
@@ -63,6 +68,8 @@ class LinkageModel(object):
         self.material_index = None
         self.update_function = None
         self.badlands_model = None
+        self.mesh = None
+        self.swarm = None
 
         # You probably want to override some of these settings
 
@@ -216,6 +223,10 @@ class LinkageModel(object):
         Badlands to Underworld, then write the initial state to disk.
         """
         assert not self._model_started
+
+        # Make sure the linkage has been correctly configured
+        for k in ['velocity_field', 'material_index', 'update_function', 'badlands_model', 'mesh', 'swarm']:
+            assert getattr(self, k) is not None, "You must configure your LinkageModel with a '%s' member" % k
 
         # Make sure UW and BL are operating over the same XY domain
         rg = self.badlands_model.recGrid
