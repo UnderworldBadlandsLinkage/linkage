@@ -331,6 +331,20 @@ class LinkageModel(object):
             self.badlands_model.force.T_disp = np.vstack(([time, time + dt], self.badlands_model.force.T_disp))
             self._disp_inserted = True
 
+        ### gaussian smoothing ###
+        dispX = np.copy(disp[:,0]).reshape(self.badlands_model.recGrid.rnx, self.badlands_model.recGrid.rny)
+        dispY = np.copy(disp[:,1]).reshape(self.badlands_model.recGrid.rnx, self.badlands_model.recGrid.rny)
+        dispZ = np.copy(disp[:,2]).reshape(self.badlands_model.recGrid.rnx, self.badlands_model.recGrid.rny)
+
+        smoothX = gaussian_filter(dispX, 1.0)
+        smoothY = gaussian_filter(dispY, 1.0)
+        smoothZ = gaussian_filter(dispZ, 1.0)
+
+        disp[:,0] = smoothX.reshape(self.badlands_model.recGrid.rnx* self.badlands_model.recGrid.rny)
+        disp[:,1] = smoothY.reshape(self.badlands_model.recGrid.rnx* self.badlands_model.recGrid.rny)
+        disp[:,2] = smoothZ.reshape(self.badlands_model.recGrid.rnx* self.badlands_model.recGrid.rny)
+        ### end gaussian smoothing ###
+
         self.badlands_model.force.injected_disps = disp
 
     def _update_material_types(self):
