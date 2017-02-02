@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.interpolate import griddata
+from scipy.ndimage.filters import gaussian_filter
 import underworld as uw
 
 
