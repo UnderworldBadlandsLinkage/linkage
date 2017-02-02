@@ -106,9 +106,10 @@ class LinkageModel(object):
 
         self.np_mesh = None  # Non-partitioned copy of 'mesh', configured during model startup
 
-    def run_for_years(self, years):
+    def run_for_years(self, years, sigma=0):
         """
-        Run the model for a number of years.
+        Run the model for a number of years. Possibility to smooth Underworld velocity
+        field using a Gaussian filter.
         """
         if not self._model_started:
             self._startup()
@@ -162,7 +163,10 @@ class LinkageModel(object):
             # Use the tracer vertical velocities to deform the Badlands TIN
             # convert from meters per second to meters displacement over the whole iteration
             tracer_disp = tracer_velocity_mps * self.SECONDS_PER_YEAR * dt_years
-            self._inject_badlands_displacement(self.time_years, dt_years, tracer_disp)
+            if sigma == 0:
+                self._inject_badlands_displacement(self.time_years, dt_years, tracer_disp)
+            else:
+                self._inject_badlands_displacement_smooth(self.time_years, dt_years, tracer_disp, sigma)
 
             # Run the Badlands model to the same time point
             self.badlands_model.run_to_time(self.time_years + dt_years)
@@ -331,14 +335,40 @@ class LinkageModel(object):
             self.badlands_model.force.T_disp = np.vstack(([time, time + dt], self.badlands_model.force.T_disp))
             self._disp_inserted = True
 
+        self.badlands_model.force.injected_disps = disp
+
+    def _inject_badlands_displacement_smooth(self, time, dt, disp, sigma):
+        """
+        Takes a plane of tracer points and their DISPLACEMENTS in 3D over time
+        period dt applies a gaussian filter on it. Injects it into Badlands as 3D
+        tectonic movement.
+        """
+
+        # TODO: what does this do? Can it be removed?
+        self.badlands_model.force.merge3d = self.badlands_model.input.Afactor * self.badlands_model.recGrid.resEdges * 0.5
+
+        # The Badlands 3D interpolation map is the displacement of each DEM
+        # node at the end of the time period relative to its starting position.
+        # If you start a new displacement file, it is treated as starting at
+        # the DEM starting points (and interpolated onto the TIN as it was at
+        # that tNow).
+
+        # kludge; don't keep adding new entries
+        if self._disp_inserted:
+            self.badlands_model.force.T_disp[0, 0] = time
+            self.badlands_model.force.T_disp[0, 1] = (time + dt)
+        else:
+            self.badlands_model.force.T_disp = np.vstack(([time, time + dt], self.badlands_model.force.T_disp))
+            self._disp_inserted = True
+
         ### gaussian smoothing ###
         dispX = np.copy(disp[:,0]).reshape(self.badlands_model.recGrid.rnx, self.badlands_model.recGrid.rny)
         dispY = np.copy(disp[:,1]).reshape(self.badlands_model.recGrid.rnx, self.badlands_model.recGrid.rny)
         dispZ = np.copy(disp[:,2]).reshape(self.badlands_model.recGrid.rnx, self.badlands_model.recGrid.rny)
 
-        smoothX = gaussian_filter(dispX, 1.0)
-        smoothY = gaussian_filter(dispY, 1.0)
-        smoothZ = gaussian_filter(dispZ, 1.0)
+        smoothX = gaussian_filter(dispX, sigma)
+        smoothY = gaussian_filter(dispY, sigma)
+        smoothZ = gaussian_filter(dispZ, sigma)
 
         disp[:,0] = smoothX.reshape(self.badlands_model.recGrid.rnx* self.badlands_model.recGrid.rny)
         disp[:,1] = smoothY.reshape(self.badlands_model.recGrid.rnx* self.badlands_model.recGrid.rny)
