@@ -14,7 +14,7 @@ RUN pip install -e /build/pyBadlands-Companion
 
 # get underworld, compile, delete some unnecessary files, trust notebooks, copy to workspace
 WORKDIR /build
-RUN git clone --branch "development" --single-branch https://github.com/underworldcode/underworld2 && \
+RUN git clone --branch "master" --single-branch https://github.com/underworldcode/underworld2 && \
     cd underworld2/libUnderworld && \
     ./configure.py --with-debugging=1  && \
     ./compile.py                 && \
